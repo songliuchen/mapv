@@ -1,19 +1,10 @@
-import BaseLayer from "../BaseLayer";
-import OpenLayer from "./OpenLayer";
-import clear from "../../canvas/clear";
-import DataSet from "../../data/DataSet";
-import TWEEN from "../../utils/Tween";
+import OpenLayers from "./OpenLayers";
 
-class Layer extends BaseLayer
+class Layer
 {
-  constructor (map = null, dataSet, options) {
-    super(map, dataSet, options);
-    this.options = options;
-    this.inner = new OpenLayer(map,dataSet,options,this);
-  }
-
-  getContext() {
-    return this.canvasLayer.canvas.getContext(this.context);
+  constructor (map = null, dataSet, options)
+  {
+    this.inner = new OpenLayers(map.pmap,dataSet,options);
   }
 }
 

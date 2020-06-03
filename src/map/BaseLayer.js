@@ -345,7 +345,7 @@ class BaseLayer {
     addAnimatorEvent() {}
 
     animatorMovestartEvent() {
-        var animationOptions = this.options.animation;
+        var animationOptions = window.options.animation;
         if (this.isEnabledTime() && this.animator) {
             this.steps.step = animationOptions.stepsRange.start;
             this.animator.stop();

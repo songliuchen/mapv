@@ -39,7 +39,7 @@ export { default as MaptalksLayer } from "./src/map/maptalks-map/Layer";
 export { default as AMapLayer } from "./src/map/gaode-map/Layer";
 export { default as OpenlayersLayer } from "./src/map/openlayers-map/Layer";
 
-//扩展支持啡
+//扩展支持飞码地图
 export { default as FmLayer } from "./src/map/fmlayers-map/Layer";
 
 export { default as leafletMapLayer } from "./src/map/leaflet-map/Layer";

@@ -5245,7 +5245,7 @@ var BaseLayer = function () {
     }, {
         key: "animatorMovestartEvent",
         value: function animatorMovestartEvent() {
-            var animationOptions = this.options.animation;
+            var animationOptions = window.options.animation;
             if (this.isEnabledTime() && this.animator) {
                 this.steps.step = animationOptions.stepsRange.start;
                 this.animator.stop();
@@ -7379,6 +7379,7 @@ var Layer$8 = function (_BaseLayer) {
   }, {
     key: "render",
     value: function render(canvas, time) {
+      debugger;
       var map = this.$Map;
       var context = canvas.getContext(this.context);
       var animationOptions = this.options.animation;
@@ -7657,11 +7658,10 @@ var Layer$8 = function (_BaseLayer) {
 }(BaseLayer);
 
 /**
- * create canvas
- * @param width
- * @param height
- * @returns {HTMLCanvasElement}
+ * MapV for openlayers (https://openlayers.org)
+ * @author sakitam-fdd - https://github.com/sakitam-fdd
  */
+
 var createCanvas$2 = function createCanvas(width, height) {
   if (typeof document !== 'undefined') {
     var canvas = document.createElement('canvas');
@@ -7674,28 +7674,27 @@ var createCanvas$2 = function createCanvas(width, height) {
   }
 };
 
-var OpenLayer = function () {
-  function OpenLayer() {
+var OpenLayers = function (_BaseLayer) {
+  inherits(OpenLayers, _BaseLayer);
+
+  function OpenLayers() {
     var map = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     var dataSet = arguments[1];
     var options = arguments[2];
-    var inner = arguments[3];
-    classCallCheck(this, OpenLayer);
+    classCallCheck(this, OpenLayers);
 
-    this.options = options;
-    //存储当前图层对象，解决当前openlayer事件无法传递this对象问题
-    window._innerOpenLayer = this;
+    var _this = possibleConstructorReturn(this, (OpenLayers.__proto__ || Object.getPrototypeOf(OpenLayers)).call(this, map, dataSet, options));
 
-    /**
-     * 保存内部对象
-     */
-    this._mapv_layer = inner;
+    _this.options = options;
+
+    //解决openlayer不兼容，事件中this对象不能指定的问题
+    window._innerOpenLayer = _this;
 
     /**
      * internal
      * @type {{canvas: null, devicePixelRatio: number}}
      */
-    this._mapv_layer.canvasLayer = {
+    _this.canvasLayer = {
       canvas: null,
       devicePixelRatio: window.devicePixelRatio
 
@@ -7704,17 +7703,18 @@ var OpenLayer = function () {
        * @type {null}
        * @private
        */
-    };this.layer_ = null;
+    };_this.layer_ = null;
 
     /**
      * previous cursor
      * @type {undefined}
      * @private
      */
-    this.previousCursor_ = undefined;
+    _this.previousCursor_ = undefined;
 
-    this.init(map.pmap, options);
-    this._mapv_layer.argCheck(options);
+    _this.init(map, options);
+    _this.argCheck(options);
+    return _this;
   }
 
   /**
@@ -7724,15 +7724,15 @@ var OpenLayer = function () {
    */
 
 
-  createClass(OpenLayer, [{
+  createClass(OpenLayers, [{
     key: "init",
     value: function init(map, options) {
       if (map && map instanceof ol.Map) {
         this.$Map = map;
-        this._mapv_layer.context = this.options.context || '2d';
+        this.context = this.options.context || '2d';
         this.getCanvasLayer();
-        this._mapv_layer.initDataRange(options);
-        this._mapv_layer.initAnimator();
+        this.initDataRange(options);
+        this.initAnimator();
         this.onEvents();
       } else {
         throw new Error('not map object');
@@ -7748,7 +7748,7 @@ var OpenLayer = function () {
   }, {
     key: "_canvasUpdate",
     value: function _canvasUpdate(time) {
-      this.render(this._mapv_layer.canvasLayer.canvas, time);
+      this.render(this.canvasLayer.canvas, time);
     }
 
     /**
@@ -7762,10 +7762,10 @@ var OpenLayer = function () {
     key: "render",
     value: function render(canvas, time) {
       var map = this.$Map;
-      var context = canvas.getContext(this._mapv_layer.context);
+      var context = canvas.getContext(this.context);
       var animationOptions = this.options.animation;
       var _projection = this.options.hasOwnProperty('projection') ? this.options.projection : 'EPSG:4326';
-      if (this._mapv_layer.isEnabledTime()) {
+      if (this.isEnabledTime()) {
         if (time === undefined) {
           clear(context);
           return this;
@@ -7781,7 +7781,7 @@ var OpenLayer = function () {
         clear(context);
       }
 
-      if (this._mapv_layer.context === '2d') {
+      if (this.context === '2d') {
         for (var key in this.options) {
           context[key] = this.options[key];
         }
@@ -7805,8 +7805,8 @@ var OpenLayer = function () {
         };
       }
 
-      var data = this._mapv_layer.dataSet.get(dataGetOptions);
-      this._mapv_layer.processData(data);
+      var data = this.dataSet.get(dataGetOptions);
+      this.processData(data);
 
       if (this.options.unit === 'm') {
         if (this.options.size) {
@@ -7824,7 +7824,7 @@ var OpenLayer = function () {
         this.options._width = this.options.width;
       }
 
-      this._mapv_layer.drawContext(context, new DataSet(data), this.options, { x: 0, y: 0 });
+      this.drawContext(context, new DataSet(data), this.options, { x: 0, y: 0 });
       this.options.updateCallback && this.options.updateCallback(time);
       return this;
     }
@@ -7836,7 +7836,7 @@ var OpenLayer = function () {
   }, {
     key: "getCanvasLayer",
     value: function getCanvasLayer() {
-      if (!this._mapv_layer.canvasLayer.canvas && !this.layer_) {
+      if (!this.canvasLayer.canvas && !this.layer_) {
         var extent = this.getMapExtent();
         this.layer_ = new ol.layer.Image({
           layerName: this.options.layerName,
@@ -7863,9 +7863,9 @@ var OpenLayer = function () {
   }, {
     key: "reRender",
     value: function reRender() {
-      if (!this.layer_) return;
-      var extent = this.getMapExtent();
-      this.layer_.setExtent(extent);
+      if (!window._innerOpenLayer.layer_) return;
+      var extent = window._innerOpenLayer.getMapExtent();
+      window._innerOpenLayer.layer_.setExtent(extent);
     }
 
     /**
@@ -7881,14 +7881,15 @@ var OpenLayer = function () {
   }, {
     key: "canvasFunction",
     value: function canvasFunction(extent, resolution, pixelRatio, size, projection) {
-      if (!this._mapv_layer.canvasLayer.canvas) {
-        this._mapv_layer.canvasLayer.canvas = createCanvas$2(size[0], size[1]);
+      if (!this.canvasLayer.canvas) {
+        this.canvasLayer.canvas = createCanvas$2(size[0], size[1]);
       } else {
-        this._mapv_layer.canvasLayer.canvas.width = size[0];
-        this._mapv_layer.canvasLayer.canvas.height = size[1];
+        this.canvasLayer.canvas.width = size[0];
+        this.canvasLayer.canvas.height = size[1];
       }
-      this.render(this._mapv_layer.canvasLayer.canvas);
-      return this._mapv_layer.canvasLayer.canvas;
+      this.render(this.canvasLayer.canvas);
+      debugger;
+      return this.canvasLayer.canvas;
     }
 
     /**
@@ -7927,12 +7928,12 @@ var OpenLayer = function () {
       this.$Map.removeLayer(this.layer_);
       delete this.$Map;
       delete this.layer_;
-      delete this._mapv_layer.canvasLayer.canvas;
+      delete this.canvasLayer.canvas;
     }
   }, {
     key: "getContext",
     value: function getContext() {
-      return this._mapv_layer.canvasLayer.canvas.getContext(this._mapv_layer.context);
+      return this.canvasLayer.canvas.getContext(this.context);
     }
 
     /**
@@ -7944,7 +7945,7 @@ var OpenLayer = function () {
     key: "clickEvent",
     value: function clickEvent(event) {
       var pixel = event.pixel;
-      window._innerOpenLayer.inner.clickEvent.apply(window._innerOpenLayer.inner, [{
+      get(OpenLayers.prototype.__proto__ || Object.getPrototypeOf(OpenLayers.prototype), "clickEvent", this).apply(window._innerOpenLayer, [{
         x: pixel[0],
         y: pixel[1]
       }, event]);
@@ -7959,7 +7960,7 @@ var OpenLayer = function () {
     key: "mousemoveEvent",
     value: function mousemoveEvent(event) {
       var pixel = event.pixel;
-      window._innerOpenLayer._mapv_layer.mousemoveEvent.apply(window._innerOpenLayer._mapv_layer, [{
+      get(OpenLayers.prototype.__proto__ || Object.getPrototypeOf(OpenLayers.prototype), "mousemoveEvent", this).apply(window._innerOpenLayer, [{
         x: pixel[0],
         y: pixel[1]
       }, event]);
@@ -8012,7 +8013,16 @@ var OpenLayer = function () {
         }
       }
     }
-
+  }, {
+    key: "animatorMovestartEvent",
+    value: function animatorMovestartEvent() {
+      get(OpenLayers.prototype.__proto__ || Object.getPrototypeOf(OpenLayers.prototype), "animatorMovestartEvent", this).apply(window._innerOpenLayer);
+    }
+  }, {
+    key: "animatorMoveendEvent",
+    value: function animatorMoveendEvent(event) {
+      get(OpenLayers.prototype.__proto__ || Object.getPrototypeOf(OpenLayers.prototype), "animatorMoveendEvent", this).apply(window._innerOpenLayer);
+    }
     /**
      * set map cursor
      * @param cursor
@@ -8035,33 +8045,17 @@ var OpenLayer = function () {
       }
     }
   }]);
-  return OpenLayer;
-}();
-
-var Layer$10 = function (_BaseLayer) {
-  inherits(Layer, _BaseLayer);
-
-  function Layer() {
-    var map = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-    var dataSet = arguments[1];
-    var options = arguments[2];
-    classCallCheck(this, Layer);
-
-    var _this = possibleConstructorReturn(this, (Layer.__proto__ || Object.getPrototypeOf(Layer)).call(this, map, dataSet, options));
-
-    _this.options = options;
-    _this.inner = new OpenLayer(map, dataSet, options, _this);
-    return _this;
-  }
-
-  createClass(Layer, [{
-    key: "getContext",
-    value: function getContext() {
-      return this.canvasLayer.canvas.getContext(this.context);
-    }
-  }]);
-  return Layer;
+  return OpenLayers;
 }(BaseLayer);
+
+var Layer$10 = function Layer() {
+  var map = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var dataSet = arguments[1];
+  var options = arguments[2];
+  classCallCheck(this, Layer);
+
+  this.inner = new OpenLayers(map.pmap, dataSet, options);
+};
 
 // https://github.com/SuperMap/iClient-JavaScript
 var MapVRenderer = function (_BaseLayer) {

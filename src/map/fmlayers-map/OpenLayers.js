@@ -1,3 +1,8 @@
+/**
+ * MapV for openlayers (https://openlayers.org)
+ * @author sakitam-fdd - https://github.com/sakitam-fdd
+ */
+
 import BaseLayer from "../BaseLayer";
 import clear from "../../canvas/clear";
 import DataSet from "../../data/DataSet";
@@ -21,23 +26,20 @@ const createCanvas = (width, height) => {
   }
 }
 
-class OpenLayer
-{
-  constructor (map = null, dataSet, options,inner) {
-    this.options = options;
-    //存储当前图层对象，解决当前openlayer事件无法传递this对象问题
-    window._innerOpenLayer = this;
+class OpenLayers extends BaseLayer {
+  constructor (map = null, dataSet, options) {
+    super(map, dataSet, options);
 
-    /**
-     * 保存内部对象
-     */
-    this._mapv_layer = inner;
+    this.options = options;
+
+    //解决openlayer不兼容，事件中this对象不能指定的问题
+    window._innerOpenLayer = this;
 
     /**
      * internal
      * @type {{canvas: null, devicePixelRatio: number}}
      */
-    this._mapv_layer.canvasLayer = {
+    this.canvasLayer = {
       canvas: null,
       devicePixelRatio: window.devicePixelRatio
     }
@@ -56,8 +58,8 @@ class OpenLayer
      */
     this.previousCursor_ = undefined
 
-    this.init(map.pmap, options);
-    this._mapv_layer.argCheck(options);
+    this.init(map, options);
+    this.argCheck(options);
   }
 
   /**
@@ -65,14 +67,13 @@ class OpenLayer
    * @param map
    * @param options
    */
-  init (map, options)
-  {
+  init (map, options) {
     if (map && map instanceof ol.Map) {
       this.$Map = map;
-      this._mapv_layer.context = this.options.context || '2d';
+      this.context = this.options.context || '2d';
       this.getCanvasLayer();
-      this._mapv_layer.initDataRange(options);
-      this._mapv_layer.initAnimator();
+      this.initDataRange(options);
+      this.initAnimator();
       this.onEvents()
     } else {
       throw new Error('not map object')
@@ -85,7 +86,7 @@ class OpenLayer
    * @private
    */
   _canvasUpdate (time) {
-    this.render(this._mapv_layer.canvasLayer.canvas, time);
+    this.render(this.canvasLayer.canvas, time);
   }
 
   /**
@@ -97,15 +98,18 @@ class OpenLayer
   render (canvas, time)
   {
     const map = this.$Map;
-    const context = canvas.getContext(this._mapv_layer.context);
+    const context = canvas.getContext(this.context);
     const animationOptions = this.options.animation;
     const _projection = this.options.hasOwnProperty('projection') ? this.options.projection : 'EPSG:4326';
-    if (this._mapv_layer.isEnabledTime()) {
-      if (time === undefined) {
+    if (this.isEnabledTime())
+    {
+      if (time === undefined)
+      {
         clear(context);
         return this;
       }
-      if (this.context === '2d') {
+      if (this.context === '2d')
+      {
         context.save();
         context.globalCompositeOperation = 'destination-out';
         context.fillStyle = 'rgba(0, 0, 0, .1)';
@@ -116,7 +120,7 @@ class OpenLayer
       clear(context);
     }
 
-    if (this._mapv_layer.context === '2d') {
+    if (this.context === '2d') {
       for (const key in this.options) {
         context[key] = this.options[key];
       }
@@ -140,8 +144,8 @@ class OpenLayer
       }
     }
 
-    const data = this._mapv_layer.dataSet.get(dataGetOptions);
-    this._mapv_layer.processData(data);
+    const data = this.dataSet.get(dataGetOptions);
+    this.processData(data);
 
     if (this.options.unit === 'm') {
       if (this.options.size) {
@@ -159,7 +163,7 @@ class OpenLayer
       this.options._width = this.options.width;
     }
 
-    this._mapv_layer.drawContext(context, new DataSet(data), this.options, {x: 0, y: 0});
+    this.drawContext(context, new DataSet(data), this.options, {x: 0, y: 0});
     this.options.updateCallback && this.options.updateCallback(time);
     return this
   }
@@ -168,7 +172,7 @@ class OpenLayer
    * get canvas layer
    */
   getCanvasLayer () {
-    if (!this._mapv_layer.canvasLayer.canvas && !this.layer_) {
+    if (!this.canvasLayer.canvas && !this.layer_) {
       const extent = this.getMapExtent();
       this.layer_ = new ol.layer.Image({
         layerName: this.options.layerName,
@@ -191,10 +195,11 @@ class OpenLayer
   /**
    * re render
    */
-  reRender () {
-    if (!this.layer_) return;
-    const extent = this.getMapExtent();
-    this.layer_.setExtent(extent);
+  reRender ()
+  {
+    if (!window._innerOpenLayer.layer_) return;
+    const extent = window._innerOpenLayer.getMapExtent();
+    window._innerOpenLayer.layer_.setExtent(extent);
   }
 
   /**
@@ -207,14 +212,15 @@ class OpenLayer
    * @returns {*}
    */
   canvasFunction (extent, resolution, pixelRatio, size, projection) {
-    if (!this._mapv_layer.canvasLayer.canvas) {
-      this._mapv_layer.canvasLayer.canvas = createCanvas(size[0], size[1])
+    if (!this.canvasLayer.canvas) {
+      this.canvasLayer.canvas = createCanvas(size[0], size[1])
     } else {
-      this._mapv_layer.canvasLayer.canvas.width = size[0];
-      this._mapv_layer.canvasLayer.canvas.height = size[1];
+      this.canvasLayer.canvas.width = size[0];
+      this.canvasLayer.canvas.height = size[1];
     }
-    this.render(this._mapv_layer.canvasLayer.canvas)
-    return this._mapv_layer.canvasLayer.canvas
+    this.render(this.canvasLayer.canvas);
+    debugger;
+    return this.canvasLayer.canvas
   }
 
   /**
@@ -244,11 +250,11 @@ class OpenLayer
     this.$Map.removeLayer(this.layer_);
     delete this.$Map;
     delete this.layer_;
-    delete this._mapv_layer.canvasLayer.canvas;
+    delete this.canvasLayer.canvas;
   }
 
   getContext() {
-    return this._mapv_layer.canvasLayer.canvas.getContext(this._mapv_layer.context);
+    return this.canvasLayer.canvas.getContext(this.context);
   }
 
   /**
@@ -257,7 +263,7 @@ class OpenLayer
    */
   clickEvent(event) {
     const pixel = event.pixel;
-    window._innerOpenLayer.inner.clickEvent.apply(window._innerOpenLayer.inner,[{
+    super.clickEvent.apply(window._innerOpenLayer,[{
       x: pixel[0],
       y: pixel[1]
     }, event]);
@@ -269,7 +275,7 @@ class OpenLayer
    */
   mousemoveEvent(event) {
     const pixel = event.pixel;
-    window._innerOpenLayer._mapv_layer.mousemoveEvent.apply(window._innerOpenLayer._mapv_layer,[{
+    super.mousemoveEvent.apply(window._innerOpenLayer,[{
       x: pixel[0],
       y: pixel[1]
     }, event]);
@@ -314,6 +320,15 @@ class OpenLayer
     }
   }
 
+  animatorMovestartEvent()
+  {
+    super.animatorMovestartEvent.apply(window._innerOpenLayer);
+  }
+
+  animatorMoveendEvent(event)
+  {
+    super.animatorMoveendEvent.apply(window._innerOpenLayer);
+  }
   /**
    * set map cursor
    * @param cursor
@@ -334,4 +349,4 @@ class OpenLayer
   }
 }
 
-export default OpenLayer
+export default OpenLayers

@@ -22,12 +22,13 @@
 
 var amap = null;
 var that = this;
+debugger;
 map.Factory.create('map', {
     // style: style,
     center: [-102.17609405517578, 34.41583177128595],
     zoom: 5,
     projection: 'EPSG:4326',
-    strategy: ['openlayers', 'mapboxgl', 'leaflet']
+    strategy: ['openlayers']
 }, (o) => {
     amap = o;
     that.init(o);
@@ -79,71 +80,6 @@ function init(map)
     };
     var mapvLayer = new mapv.FmLayer(amap, dataSet, options);
 }
-
-  // var map = new ol.Map({
-  //   target: 'map',
-  //   layers: [
-  //     new ol.layer.Tile({
-  //       layerName: 'baseLayer',
-  //       preload: 4,
-  //       source: new ol.source.OSM({
-  //         url: 'http://{a-e}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-  //       })
-  //     })
-  //   ],
-  //   loadTilesWhileAnimating: true,
-  //   pixelRatio: 1,
-  //   view: new ol.View({
-  //     projection: 'EPSG:4326',
-  //     center: [-102.17609405517578, 34.41583177128595],
-  //     zoom: 5
-  //   })
-  // });
-
-  // var randomCount = 500;
-  // var data = [];
-  // while (randomCount--) {
-  //   data.push({
-  //     geometry: {
-  //       type: 'Point',
-  //       coordinates: [-125.8 + Math.random() * 50, 30.3 + Math.random() * 20]
-  //     },
-  //     count: 30 * Math.random()
-  //   });
-  // }
-
-  // var dataSet = new mapv.DataSet(data);
-
-  // var options = {
-  //   max: 30, // 设置显示的权重最大值
-  //   type: 'circle', // 点形状,可选circle:圆形(默认),rect:矩形
-  //   size:10, // 半径大小
-  //   maxOpacity: 0.9,
-  //   gradient: { // 显示的颜色渐变范围
-  //     '0': 'blue',
-  //     '0.6': 'cyan',
-  //     '0.7': 'lime',
-  //     '0.8': 'yellow',
-  //     '1.0': 'red'
-  //   },
-  //   draw: 'heatmap',
-  //   projection: 'EPSG:4326',
-  //   methods: {
-  //     click: function (event) {
-  //       console.log(event)
-  //     },
-  //     mousemove: function (event) {
-  //       // if (event) {
-  //       //   mapvLayer.setDefaultCursor('pointer', event)
-  //       // } else {
-  //       //   mapvLayer.setDefaultCursor('default', event)
-  //       // }
-  //     }
-  //   }
-  // };
-
-  // var mapvLayer = new mapv.FmLayer(map, dataSet, options);
-
 </script>
 </body>
 </html>
