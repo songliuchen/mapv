@@ -2,7 +2,6 @@
 <a href="http://mapv.baidu.com/">
     <img style="vertical-align: top;" src="./asset/logo.png?raw=true" alt="logo">
 </a>
-
 主页: [http://mapv.baidu.com/](http://mapv.baidu.com/)
 
 备用主页: [huiyan-fe.github.io/mapv/](http://huiyan-fe.github.io/mapv/)
@@ -38,6 +37,16 @@ Mapv使用canvas开发，支持现在被称为“现代”浏览器, 通常兼�
     <script src="http://huiyan-fe.github.io/mapv/build/mapv.min.js"></script>
 
 你也可以下载[最后发布的版本](https://github.com/huiyan-fe/mapv/releases)。也可以使用示例中的版本。
+
+### windows 脚本,
+```
+"pre": "rd/s/q build\\release & mkdir build\\release"
++ require(\"./package.json\").version + \"\\\";\\n\");' > build/version.js",
+```
+### linux 版本
+```
+"pre": "mkdir -p build && mkdir -p build/release && node -e 'process.stdout.write(\"export var version = \\\"\" + require(\"./package.json\").version + \"\\\";\\n\");' > build/version.js",
+```
 ### 初始化环境
     npm install
 ### 开发

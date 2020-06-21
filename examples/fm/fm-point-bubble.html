@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>fm-point-bubble</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body, #map {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<!-- <script src="http://localhost:9000/map.min.js"></script> -->
+<script src="http://129.211.11.95/protal/js_example/script/map.min.js"></script>
+<script src="../../build/mapv.js"></script>
+<script>
+var amap = null;
+var that = this;
+map.Factory.create('map', {
+    center: [106.17609405517578, 35.41583177128595],
+    fullExtent: {
+        xmin: 90.992204,
+        ymin: 10.979711,
+        xmax: 120.5338915,
+        ymax: 50.543712
+    },
+    zoom: 5,
+    projection: 'EPSG:4326',
+    strategy: ['openlayers']
+}, (o) => {
+    amap = o;
+    that.init(o);
+});
+
+function init(map)
+{
+  var randomCount = 300;
+  var data = [];
+  while (randomCount--) {
+    data.push({
+      geometry: {
+        type: 'Point',
+        coordinates: [90.8 + Math.random() * 50, 10.3 + Math.random() * 20]
+      },
+      count: 30 * Math.random()
+    });
+  }
+
+  var dataSet = new mapv.DataSet(data);
+
+  var options = {
+    fillStyle: 'rgba(255, 250, 50, 0.8)',
+    globalCompositeOperation: "lighter",
+    maxSize: 10,
+    max: 30,
+    shadowBlur: 30,
+    shadowColor: 'rgba(255, 250, 50, 1)',
+    draw: 'bubble',
+    projection: 'EPSG:4326',
+    methods: {
+      click: function (event) {
+        console.log(event)
+      },
+      mousemove: function (event) {
+        if (event) {
+          mapvLayer.setDefaultCursor('pointer', event)
+        } else {
+          mapvLayer.setDefaultCursor('default', event)
+        }
+      }
+    }
+  };
+  var mapvLayer = new mapv.FmLayer(amap, dataSet, options);
+}
+</script>
+</body>
+</html>

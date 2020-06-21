@@ -4,7 +4,12 @@ class Layer
 {
   constructor (map = null, dataSet, options)
   {
-    this.inner = new OpenLayers(map.pmap,dataSet,options);
+    this.player = new OpenLayers(map.pmap,dataSet,options);
+  }
+
+  setDefaultCursor(cursor, feature)
+  {
+    this.player.setDefaultCursor(cursor,feature);
   }
 }
 

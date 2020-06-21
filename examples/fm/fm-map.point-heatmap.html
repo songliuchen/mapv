@@ -14,18 +14,21 @@
 </head>
 <body>
 <div id="map"></div>
+<!-- <script src="http://localhost:9000/map.min.js"></script> -->
 <script src="http://129.211.11.95/protal/js_example/script/map.min.js"></script>
-<!-- 解决找不到style问题 -->
-<script src="http://129.211.11.95/protal/js_example/script/demo.js"></script>
 <script src="../../build/mapv.js"></script>
 <script>
 
 var amap = null;
 var that = this;
-debugger;
 map.Factory.create('map', {
-    // style: style,
-    center: [-102.17609405517578, 34.41583177128595],
+    center: [106.17609405517578, 35.41583177128595],
+    fullExtent: {
+        xmin: 90.992204,
+        ymin: 10.979711,
+        xmax: 120.5338915,
+        ymax: 50.543712
+    },
     zoom: 5,
     projection: 'EPSG:4326',
     strategy: ['openlayers']
@@ -43,7 +46,7 @@ function init(map)
       data.push({
         geometry: {
           type: 'Point',
-          coordinates: [105.8 + Math.random() * 50, 36.3 + Math.random() * 20]
+          coordinates: [90.8 + Math.random() * 50, 10.3 + Math.random() * 20]
         },
         count: 30 * Math.random()
       });
@@ -65,15 +68,15 @@ function init(map)
       },
       draw: 'heatmap',
       projection: 'EPSG:4326',
-      methods: {
+      methods: { 
         click: function (event) {
           console.log(event)
         },
         mousemove: function (event) {
           if (event) {
-            mapvLayer.inner.setDefaultCursor('pointer', event)
+            mapvLayer.setDefaultCursor('pointer', event)
           } else {
-            mapvLayer.inner.setDefaultCursor('default', event)
+            mapvLayer.setDefaultCursor('default', event)
           }
         }
       }

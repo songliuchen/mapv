@@ -219,7 +219,6 @@ class OpenLayers extends BaseLayer {
       this.canvasLayer.canvas.height = size[1];
     }
     this.render(this.canvasLayer.canvas);
-    debugger;
     return this.canvasLayer.canvas
   }
 
