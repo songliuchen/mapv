@@ -1,10 +1,9 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>ol-webgl-simple</title>
+  <title>fm-webgl-simple</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css">
   <style>
     html, body, #map {
       height: 100%;
@@ -16,33 +15,32 @@
 <body>
 <div id="map"></div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
+<!-- <script src="http://localhost:9000/map.min.js"></script> -->
+<script src="http://129.211.11.95/protal/js_example/script/map.min.js"></script>
 <script src="../../build/mapv.js"></script>
 <script>
-  var map = new ol.Map({
-    target: 'map',
-    layers: [
-      new ol.layer.Tile({
-        layerName: 'baseLayer',
-        preload: 4,
-        source: new ol.source.OSM({
-          url: 'http://{a-e}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-        })
-      })
-    ],
-    loadTilesWhileAnimating: true,
-    pixelRatio: 1,
-    view: new ol.View({
-      projection: 'EPSG:4326',
-      center: [116.443571, 39.987549],
-      zoom: 13
-    })
-  });
+var amap = null;
+var that = this;
+map.Factory.create('map', {
+    center: [116.403694,39.914271],
+    fullExtent: {
+        xmin: 115.25,
+        ymin: 39.28,
+        xmax: 117.35,
+        ymax: 41.03
+    },
+    zoom: 10,
+    projection: 'EPSG:4326',
+    strategy: ['openlayers']
+}, (o) => {
+    amap = o;
+    that.init(o);
+});
 
+function init(map)
+{
   $.get('../data/beijing-village.json', function (data) {
-
     var dataSet = new mapv.DataSet(data);
-
     var options = {
       fillStyle: 'rgba(255, 80, 53, 0.8)',
       strokeStyle: 'rgba(250, 255, 53, 0.8)',
@@ -53,9 +51,9 @@
       projection: 'EPSG:4326'
     }
 
-    var mapvLayer = new mapv.OpenlayersLayer(map, dataSet, options);
+    var mapvLayer = new mapv.FmLayer(map, dataSet, options);
   });
-
+}
 </script>
 </body>
 </html>

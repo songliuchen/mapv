@@ -5245,7 +5245,7 @@ var BaseLayer = function () {
     }, {
         key: "animatorMovestartEvent",
         value: function animatorMovestartEvent() {
-            var animationOptions = window.options.animation;
+            var animationOptions = this.options.animation;
             if (this.isEnabledTime() && this.animator) {
                 this.steps.step = animationOptions.stepsRange.start;
                 this.animator.stop();
@@ -7379,7 +7379,6 @@ var Layer$8 = function (_BaseLayer) {
   }, {
     key: "render",
     value: function render(canvas, time) {
-      debugger;
       var map = this.$Map;
       var context = canvas.getContext(this.context);
       var animationOptions = this.options.animation;

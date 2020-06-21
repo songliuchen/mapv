@@ -1,10 +1,9 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>ol-polyline-animation</title>
+  <title>fm-polyline-animation</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css">
   <style>
     html, body, #map {
       height: 100%;
@@ -16,30 +15,30 @@
 <body>
 <div id="map"></div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
+<!-- <script src="http://localhost:9000/map.min.js"></script> -->
+<script src="http://129.211.11.95/protal/js_example/script/map.min.js"></script>
 <script src="../../build/mapv.js"></script>
 <script>
+var amap = null;
+var that = this;
+map.Factory.create('map', {
+    center: [116.41348403785, 39.910843952376],
+    fullExtent: {
+        xmin: 90.992204,
+        ymin: 10.979711,
+        xmax: 120.5338915,
+        ymax: 50.543712
+    },
+    zoom: 12,
+    projection: 'EPSG:4326',
+    strategy: ['openlayers']
+}, (o) => {
+    amap = o;
+    that.init(o);
+});
 
-  var map = new ol.Map({
-    target: 'map',
-    layers: [
-      new ol.layer.Tile({
-        layerName: 'baseLayer',
-        preload: 4,
-        source: new ol.source.OSM({
-          url: 'http://{a-e}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-        })
-      })
-    ],
-    loadTilesWhileAnimating: true,
-    pixelRatio: 1,
-    view: new ol.View({
-      projection: 'EPSG:4326',
-      center: [116.41348403785, 39.910843952376],
-      zoom: 12
-    })
-  });
-
+function init(map)
+{
   $.get('../data/od-xierqi.txt', function (rs) {
     var data = [];
     var timeData = [];
@@ -94,7 +93,7 @@
       // zIndex: 1
     }
 
-    var mapvLineLayer = new mapv.OpenlayersLayer(map, lineDataSet, lineOptions);
+    var mapvLineLayer = new mapv.FmLayer(map, lineDataSet, lineOptions);
 
     var dataSet = new mapv.DataSet(timeData);
 
@@ -116,8 +115,9 @@
       // zIndex: 0
     }
 
-    var mapvLayer = new mapv.OpenlayersLayer(map, dataSet, options);
+    var mapvLayer = new mapv.FmLayer(map, dataSet, options);
   });
+}
 </script>
 </body>
 </html>

@@ -93,7 +93,6 @@ class Layer extends BaseLayer {
    * @returns {Layer}
    */
   render (canvas, time) {
-    debugger;
     const map = this.$Map;
     const context = canvas.getContext(this.context);
     const animationOptions = this.options.animation;
