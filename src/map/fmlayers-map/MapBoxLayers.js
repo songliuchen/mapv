@@ -5,7 +5,6 @@
 import BaseLayer from "../BaseLayer";
 import clear from "../../canvas/clear";
 import DataSet from "../../data/DataSet";
-import TWEEN from "../../utils/Tween";
 
 /**
  * create canvas
@@ -25,15 +24,12 @@ const createCanvas = (width, height) => {
   }
 }
 
-class OpenLayers extends BaseLayer {
+class MapBoxLayers extends BaseLayer {
   constructor (map = null, dataSet, options) {
     super(map, dataSet, options);
-
     this.options = options;
-
     //解决openlayer不兼容，事件中this对象不能指定的问题
     window._innerLayer = this;
-
     /**
      * internal
      * @type {{canvas: null, devicePixelRatio: number}}
@@ -347,4 +343,4 @@ class OpenLayers extends BaseLayer {
   }
 }
 
-export default OpenLayers
+export default MapBoxLayers
