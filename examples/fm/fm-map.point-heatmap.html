@@ -15,7 +15,7 @@
 <body>
 <div id="map"></div>
 <!-- <script src="http://localhost:9000/map.min.js"></script> -->
-<script src="http://129.211.11.95/protal/js_example/script/map.min.js"></script>
+<script src="http://47.95.220.20/gisprotal/js_example/script/map.min.js"></script>
 <script src="../../build/mapv.js"></script>
 <script>
 
@@ -31,7 +31,7 @@ map.Factory.create('map', {
     },
     zoom: 5,
     projection: 'EPSG:4326',
-    strategy: ['openlayers']
+    strategy: ['mapboxgl','openlayers','mapboxgl']
 }, (o) => {
     amap = o;
     that.init(o);

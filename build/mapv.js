@@ -253,6 +253,35 @@ var possibleConstructorReturn = function (self, call) {
  * @author kyle / http://nikai.us/
  */
 
+/**
+ * DataSet
+ *
+ * A data set can:
+ * - add/remove/update data
+ * - gives triggers upon changes in the data
+ * - can  import/export data in various data formats
+ * @param {Array} [data]    Optional array with initial data
+ * the field geometry is like geojson, it can be:
+ * {
+ *     "type": "Point",
+ *     "coordinates": [125.6, 10.1]
+ * }
+ * {
+ *     "type": "LineString",
+ *     "coordinates": [
+ *         [102.0, 0.0], [103.0, 1.0], [104.0, 0.0], [105.0, 1.0]
+ *     ]
+ * }
+ * {
+ *     "type": "Polygon",
+ *     "coordinates": [
+ *         [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
+ *           [100.0, 1.0], [100.0, 0.0] ]
+ *     ]
+ * }
+ * @param {Object} [options]   Available options:
+ * 
+ */
 function DataSet(data, options) {
     Event.bind(this)();
 
@@ -810,6 +839,11 @@ function Canvas(width, height) {
  * @author kyle / http://nikai.us/
  */
 
+/**
+ * Category
+ * @param {Object} [options]   Available options:
+ *                             {Object} gradient: { 0.25: "rgb(0,0,255)", 0.55: "rgb(0,255,0)", 0.85: "yellow", 1.0: "rgb(255,0,0)"}
+ */
 function Intensity(options) {
 
     options = options || {};
@@ -2994,18 +3028,6 @@ var MapHelper = function () {
     }]);
     return MapHelper;
 }();
-
-// function MapHelper(dom, type, opt) {
-//     var map = new BMap.Map(dom, {
-//         enableMapClick: false
-//     });
-//     map.centerAndZoom(new BMap.Point(106.962497, 38.208726), 5);
-//     map.enableScrollWheelZoom(true);
-
-//     map.setMapStyle({
-//         style: 'light'
-//     });
-// }
 
 /**
  * 一直覆盖在当前地图视野的Canvas对象
@@ -6974,6 +6996,13 @@ var Layer$5 = Layer$4;
  * @author sakitam-fdd - https://github.com/sakitam-fdd
  */
 
+/**
+ * create canvas
+ * @param width
+ * @param height
+ * @param Canvas
+ * @returns {HTMLCanvasElement}
+ */
 var createCanvas = function createCanvas(width, height, Canvas) {
     if (typeof document !== 'undefined') {
         var canvas = document.createElement('canvas');
@@ -7283,6 +7312,12 @@ var Layer$6 = function (_BaseLayer) {
  * @author sakitam-fdd - https://github.com/sakitam-fdd
  */
 
+/**
+ * create canvas
+ * @param width
+ * @param height
+ * @returns {HTMLCanvasElement}
+ */
 var createCanvas$1 = function createCanvas(width, height) {
   if (typeof document !== 'undefined') {
     var canvas = document.createElement('canvas');
@@ -7660,6 +7695,12 @@ var Layer$8 = function (_BaseLayer) {
  * @author sakitam-fdd - https://github.com/sakitam-fdd
  */
 
+/**
+ * create canvas
+ * @param width
+ * @param height
+ * @returns {HTMLCanvasElement}
+ */
 var createCanvas$2 = function createCanvas(width, height) {
   if (typeof document !== 'undefined') {
     var canvas = document.createElement('canvas');
@@ -8045,6 +8086,8 @@ var OpenLayers = function (_BaseLayer) {
   return OpenLayers;
 }(BaseLayer);
 
+var _this = undefined;
+
 /**
  * @author sakitam-fdd - https://github.com/sakitam-fdd
  */
@@ -8062,6 +8105,7 @@ var createCanvas$3 = function createCanvas(width, height) {
     canvas.height = height;
     return canvas;
   } else {
+    return _this.$Map.getCanvas();
     // create a new canvas instance in node.js
     // the canvas class needs to have a default constructor without any parameter
   }
@@ -8076,16 +8120,17 @@ var MapBoxLayers = function (_BaseLayer) {
     var options = arguments[2];
     classCallCheck(this, MapBoxLayers);
 
-    var _this = possibleConstructorReturn(this, (MapBoxLayers.__proto__ || Object.getPrototypeOf(MapBoxLayers)).call(this, map, dataSet, options));
+    var _this2 = possibleConstructorReturn(this, (MapBoxLayers.__proto__ || Object.getPrototypeOf(MapBoxLayers)).call(this, map, dataSet, options));
 
-    _this.options = options;
+    _this2.dataSet = dataSet;
+    _this2.options = options;
     //解决openlayer不兼容，事件中this对象不能指定的问题
-    window._innerLayer = _this;
+    window._innerLayer = _this2;
     /**
      * internal
      * @type {{canvas: null, devicePixelRatio: number}}
      */
-    _this.canvasLayer = {
+    _this2.canvasLayer = {
       canvas: null,
       devicePixelRatio: window.devicePixelRatio
 
@@ -8094,18 +8139,18 @@ var MapBoxLayers = function (_BaseLayer) {
        * @type {null}
        * @private
        */
-    };_this.layer_ = null;
+    };_this2.layer_ = null;
 
     /**
      * previous cursor
      * @type {undefined}
      * @private
      */
-    _this.previousCursor_ = undefined;
+    _this2.previousCursor_ = undefined;
 
-    _this.init(map, options);
-    _this.argCheck(options);
-    return _this;
+    _this2.init(map, options);
+    _this2.argCheck(options);
+    return _this2;
   }
 
   /**
@@ -8118,7 +8163,8 @@ var MapBoxLayers = function (_BaseLayer) {
   createClass(MapBoxLayers, [{
     key: "init",
     value: function init(map, options) {
-      if (map && map instanceof ol.Map) {
+      if (map && map instanceof mapboxgl.Map) {
+
         this.$Map = map;
         this.context = this.options.context || '2d';
         this.getCanvasLayer();
@@ -8181,20 +8227,20 @@ var MapBoxLayers = function (_BaseLayer) {
       }
       var dataGetOptions = {
         transferCoordinate: function transferCoordinate(coordinate) {
-          return map.getPixelFromCoordinate(ol.proj.transform(coordinate, _projection, 'EPSG:4326'));
+          return coordinate;
         }
       };
 
-      if (time !== undefined) {
-        dataGetOptions.filter = function (item) {
-          var trails = animationOptions.trails || 10;
-          if (time && item.time > time - trails && item.time < time) {
-            return true;
-          } else {
-            return false;
-          }
-        };
-      }
+      // if (time !== undefined) {
+      //   dataGetOptions.filter = function (item) {
+      //     const trails = animationOptions.trails || 10;
+      //     if (time && item.time > (time - trails) && item.time < time) {
+      //       return true;
+      //     } else {
+      //       return false;
+      //     }
+      //   }
+      // }
 
       var data = this.dataSet.get(dataGetOptions);
       this.processData(data);
@@ -8227,24 +8273,73 @@ var MapBoxLayers = function (_BaseLayer) {
   }, {
     key: "getCanvasLayer",
     value: function getCanvasLayer() {
+      var _this3 = this;
+
       if (!this.canvasLayer.canvas && !this.layer_) {
-        var extent = this.getMapExtent();
-        this.layer_ = new ol.layer.Image({
-          layerName: this.options.layerName,
-          minResolution: this.options.minResolution,
-          maxResolution: this.options.maxResolution,
-          zIndex: this.options.zIndex,
-          extent: extent,
-          source: new ol.source.ImageCanvas({
-            canvasFunction: this.canvasFunction.bind(this),
-            projection: this.options.hasOwnProperty('projection') ? this.options.projection : 'EPSG:4326',
-            ratio: this.options.hasOwnProperty('ratio') ? this.options.ratio : 1
-          })
+        this.getData();
+        this.$Map.addImage('pulsing-dot', this.pulsingDot, { pixelRatio: 1.25 });
+
+        this.features = [];
+        this.dataSet._data.forEach(function (data) {
+          var feature = {};
+          feature.type = 'Feature';
+          feature.geometry = data.geometry;
+          _this3.features.push(feature);
         });
+        this.$Map.addSource('points', {
+          'type': 'geojson',
+          'data': {
+            'type': 'FeatureCollection',
+            'features': this.features
+          }
+        });
+        this.layer_ = {
+          'id': 'points',
+          'type': 'symbol',
+          'source': 'points',
+          'layout': {
+            'icon-image': 'pulsing-dot'
+          }
+        };
         this.$Map.addLayer(this.layer_);
-        this.$Map.un('precompose', this.reRender, this);
-        this.$Map.on('precompose', this.reRender, this);
+
+        // this.$Map.on('wheel', this.canvasFunction);
       }
+    }
+  }, {
+    key: "getData",
+    value: function getData() {
+      var map = this.$Map;
+      var that = this;
+      var size = 200;
+
+      this.pulsingDot = {
+        width: size,
+        height: size,
+        data: new Uint8Array(size * size * 4),
+
+        // get rendering context for the map canvas when layer is added to the map
+        onAdd: function onAdd() {
+          var canvas = document.createElement('canvas');
+          canvas.width = 1920;
+          canvas.height = 187.5;
+          that.canvasLayer.canvas = canvas;
+          this.context = that.getContext();
+          that.render(that.canvasLayer.canvas);
+        },
+
+        // called once before every frame where the icon will be used
+        render: function render() {
+          // update this image's data with data from the canvas
+          this.data = this.context.getImageData(0, 0, this.width, this.height).data;
+
+          // continuously repaint the map, resulting in the smooth animation of the dot
+          map.triggerRepaint();
+
+          // return `true` to let the map know that the image was updated
+          return true;
+        }
+      };
     }
 
     /**
@@ -8290,8 +8385,7 @@ var MapBoxLayers = function (_BaseLayer) {
   }, {
     key: "getMapExtent",
     value: function getMapExtent() {
-      var size = this.$Map.getSize();
-      return this.$Map.getView().calculateExtent(size);
+      return this.$Map.getBounds();
     }
 
     /**
@@ -8314,7 +8408,6 @@ var MapBoxLayers = function (_BaseLayer) {
     value: function removeLayer() {
       if (!this.$Map) return;
       this.unEvents();
-      this.$Map.un('precompose', this.reRender, this);
       this.$Map.removeLayer(this.layer_);
       delete this.$Map;
       delete this.layer_;
@@ -8363,8 +8456,8 @@ var MapBoxLayers = function (_BaseLayer) {
   }, {
     key: "addAnimatorEvent",
     value: function addAnimatorEvent() {
-      this.$Map.on('movestart', this.animatorMovestartEvent, this);
-      this.$Map.on('moveend', this.animatorMoveendEvent, this);
+      this.$Map.on('movestart', this.animatorMovestartEvent);
+      this.$Map.on('moveend', this.animatorMoveendEvent);
     }
 
     /**
@@ -8378,10 +8471,10 @@ var MapBoxLayers = function (_BaseLayer) {
       this.unEvents();
       if (this.options.methods) {
         if (this.options.methods.click) {
-          map.on('click', this.clickEvent, this);
+          map.on('click', this.clickEvent);
         }
         if (this.options.methods.mousemove) {
-          map.on('pointermove', this.mousemoveEvent, this);
+          map.on('move', this.mousemoveEvent);
         }
       }
     }
@@ -8396,10 +8489,10 @@ var MapBoxLayers = function (_BaseLayer) {
       var map = this.$Map;
       if (this.options.methods) {
         if (this.options.methods.click) {
-          map.un('click', this.clickEvent, this);
+          map.off('click', this.clickEvent);
         }
         if (this.options.methods.pointermove) {
-          map.un('pointermove', this.mousemoveEvent, this);
+          map.off('move', this.mousemoveEvent);
         }
       }
     }
@@ -8465,6 +8558,17 @@ var Layer$10 = function () {
 }();
 
 // https://github.com/SuperMap/iClient-JavaScript
+/**
+ * @class MapVRenderer
+ * @classdesc 地图渲染类。
+ * @category Visualization MapV
+ * @private
+ * @extends mapv.BaseLayer
+ * @param {L.Map} map - 待渲染的地图。
+ * @param {L.Layer} layer - 待渲染的图层。
+ * @param {DataSet} dataSet - 待渲染的数据集。
+ * @param {Object} options - 渲染的参数。
+ */
 var MapVRenderer = function (_BaseLayer) {
     inherits(MapVRenderer, _BaseLayer);
 
