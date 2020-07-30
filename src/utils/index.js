@@ -8,10 +8,11 @@ function getAngle(start, end) {
     var diff_x = end[0] - start[0];
     var diff_y = end[1] - start[1];
     var deg = 360 * Math.atan(diff_y / diff_x) / (2 * Math.PI);
-    if(end[0] < start[0]){
+    if (end[0] < start[0]) {
         deg = deg + 180;
     }
     return deg;
 }
 
-export {getAngle};
+
+export { getAngle };

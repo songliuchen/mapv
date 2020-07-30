@@ -33,7 +33,7 @@ map.Factory.create('map', {
     },
     zoom: 5,
     projection: 'EPSG:4326',
-    strategy: ['openlayers']
+    strategy: ['mapboxgl', 'openlayers']
 }, (o) => {
     amap = o;
     that.init(o);
